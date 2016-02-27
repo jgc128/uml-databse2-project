@@ -1,11 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
+//#include <stdio.h>
+#include <cstdlib>
+#include <iostream>
+#include <fstream> 
+#include <string>
+
+using namespace std;
 
 int main(int argc, char **argv) {
 
 	if (argc != 5)
 	{
-		fprintf(stderr, "Usage: %s <input_file> <output_file> <order:0|1> <memory_limit, Mb>\n", argv[0]);
+		cerr << "Usage: " << argv[0] << " <input_file> <output_file> <order:0|1> <memory_limit, Mb>" << endl;
 		return 1;
 	}
 
@@ -19,16 +24,6 @@ int main(int argc, char **argv) {
 	printf("Order:\t\t%d\n", order);
 	printf("Memory limit:\t%d\n", memory_limit);
 
-	auto input_file_ptr = fopen(input_filename, "r");
-	if (input_file_ptr == NULL)
-	{
-		fprintf(stderr, "Cannot open the file: %s", input_filename);
-		return 1;
-	}
-
-	fclose(input_file_ptr);
-
-	getchar();
 
 	return 0;
 }
