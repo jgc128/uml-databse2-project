@@ -33,13 +33,13 @@ int main(int argc, char **argv) {
 	cout << "Numbers: " << numbers.size() << endl;
 
 
-	auto data = vector<int>();
-	
-	for (auto i = 0; i < 20; i++)
-		data.push_back(RandomNumberGenerator::get_random_number(0, 10));
+	TimeMeasurer time_measurer = TimeMeasurer();
+	time_measurer.start();
 
-	quicksort(data, 0, data.size() - 1);
+	quicksort(numbers);
 
+	auto time_taken = time_measurer.end();
+	cout << "Sorted: " << time_taken << endl;
 
 
 	int any_key;

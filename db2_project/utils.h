@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <random>
+#include <ctime>
 
 using namespace std;
 
@@ -99,6 +100,30 @@ template<typename T> size_t quicksort_partition(vector<T> &data, size_t low, siz
 	}
 
 }
+
+/* ======================================
+=========================================
+========================================*/
+
+
+
+
+/* =======================================
+=== TimeMeasurer =========================
+========================================*/
+
+class TimeMeasurer
+{
+protected:
+	clock_t start_time;
+	clock_t end_time;
+public:
+	TimeMeasurer();
+
+	void start();
+	double end();
+	double get_duration();
+};
 
 /* ======================================
 =========================================
