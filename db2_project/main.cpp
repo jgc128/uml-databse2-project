@@ -33,10 +33,13 @@ int main(int argc, char **argv) {
 	cout << "Numbers: " << numbers.size() << endl;
 
 
-	for (auto i = 0; i < 10; i++)
-	{
-		cout << RandomNumberGenerator::get_random_number<long long>(0LL, 10LL) << endl;
-	}
+	auto data = vector<int>();
+	
+	for (auto i = 0; i < 20; i++)
+		data.push_back(RandomNumberGenerator::get_random_number(0, 10));
+
+	quicksort(data, 0, data.size() - 1);
+
 
 
 	int any_key;
