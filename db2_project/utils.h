@@ -54,27 +54,27 @@ template<typename T> T RandomNumberGenerator::get_random_number(T from, T to)
 === QuickSort ============================
 ========================================*/
 
-template<typename T> void quicksort(vector<T> &data);
-template<typename T> void quicksort(vector<T> &data, size_t low, size_t high);
-template<typename T> size_t quicksort_partition(vector<T> &data, size_t low, size_t high);
-
-template<typename T> void quicksort(vector<T> &data)
+template<typename T> 
+class QuickSort
 {
-	quicksort(data, 0, data.size() - 1);
-}
+protected:
+	unsigned long long partition_calls;
+	unsigned long long quicksort_calls;
 
-template<typename T> void quicksort(vector<T> &data, size_t low, size_t high)
-{
-	if (low < high)
-	{
-		auto p = quicksort_partition(data, low, high);
-		quicksort(data, low, p);
-		quicksort(data, p + 1, high);
-	}
-}
+	size_t partition(vector<T> &data, size_t low, size_t high);
+	void quicksort(vector<T> &data, size_t low, size_t high);
+public:
+	void sort(vector<T> &data);
+	void sort(vector<T> &data, size_t low, size_t high);
 
-template<typename T> size_t quicksort_partition(vector<T> &data, size_t low, size_t high)
+	unsigned long long number_passes();
+};
+
+
+template<typename T> size_t QuickSort<T>::partition(vector<T> &data, size_t low, size_t high)
 {
+	partition_calls++;
+
 	auto pivot_idx = RandomNumberGenerator::get_random_number(low, high);
 
 	swap(data[low], data[pivot_idx]);
@@ -98,7 +98,36 @@ template<typename T> size_t quicksort_partition(vector<T> &data, size_t low, siz
 
 		swap(data[l], data[r]);
 	}
+}
 
+template<typename T> void QuickSort<T>::quicksort(vector<T> &data, size_t low, size_t high)
+{
+	quicksort_calls++;
+
+	if (low < high)
+	{
+		auto p = partition(data, low, high);
+		quicksort(data, low, p);
+		quicksort(data, p + 1, high);
+	}
+}
+
+template<typename T> void QuickSort<T>::sort(vector<T> &data)
+{
+	sort(data, 0, data.size() - 1);
+}
+
+template<typename T> void QuickSort<T>::sort(vector<T> &data, size_t low, size_t high)
+{
+	partition_calls = 0;
+	quicksort_calls = 0;
+
+	quicksort(data, low, high);
+}
+
+template<typename T> unsigned long long QuickSort<T>::number_passes()
+{
+	return quicksort_calls;
 }
 
 /* ======================================

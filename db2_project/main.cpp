@@ -36,10 +36,15 @@ int main(int argc, char **argv) {
 	TimeMeasurer time_measurer = TimeMeasurer();
 	time_measurer.start();
 
-	quicksort(numbers);
+	auto sorting = QuickSort<long long>();
+
+	sorting.sort(numbers);
 
 	auto time_taken = time_measurer.end();
-	cout << "Sorted: " << time_taken << endl;
+	auto num_passes = sorting.number_passes();
+
+	cout << "Sorted: " << num_passes << " passes, " << time_taken << "ms" << endl;
+
 
 
 	int any_key;
