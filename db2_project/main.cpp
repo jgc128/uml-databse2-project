@@ -1,8 +1,10 @@
-//#include <stdio.h>
 #include <cstdlib>
 #include <iostream>
+#include <iomanip>
 #include <fstream> 
 #include <string>
+
+#include "utils.h"
 
 using namespace std;
 
@@ -19,11 +21,26 @@ int main(int argc, char **argv) {
 	auto order = atoi(argv[3]);
 	auto memory_limit = atoi(argv[4]);
 
-	printf("Input:\t\t%s\n", input_filename);
-	printf("Output:\t\t%s\n", output_filename);
-	printf("Order:\t\t%d\n", order);
-	printf("Memory limit:\t%d\n", memory_limit);
+	cout << "Input: " << setw(15) << input_filename << endl;
+	cout << "Output: " << output_filename << endl;
+	cout << "Order: " << order << endl;
+	cout << "Memory limit: " << memory_limit << endl;
 
+
+	// load file to perform quicksort
+	auto numbers = load_file(input_filename);
+
+	cout << "Numbers: " << numbers.size() << endl;
+
+
+	for (auto i = 0; i < 10; i++)
+	{
+		cout << RandomNumberGenerator::get_random_number<long long>(0LL, 10LL) << endl;
+	}
+
+
+	int any_key;
+	cin >> any_key;
 
 	return 0;
 }
