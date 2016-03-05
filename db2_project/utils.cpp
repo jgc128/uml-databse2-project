@@ -36,3 +36,4 @@ vector<long long> load_file(string filename)
 
 	return results;
 }
+
