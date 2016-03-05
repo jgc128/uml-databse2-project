@@ -5,6 +5,9 @@
 #include <string>
 
 #include "utils.h"
+#include "time_measurer.h"
+#include "quick_sort.h"
+#include "random_number_generator.h"
 
 using namespace std;
 
