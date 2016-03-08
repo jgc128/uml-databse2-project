@@ -19,10 +19,10 @@ void do_quicksort(string input_filename, string output_filename, unsigned long o
 
 	cout << padded_string("Numbers:") << numbers.size() << endl;
 
-	TimeMeasurer time_measurer = TimeMeasurer();
+	TimeMeasurer time_measurer;
 	time_measurer.start();
 
-	auto sorting = QuickSort<long long>();
+	QuickSort<long long> sorting;
 
 	sorting.sort(numbers);
 
@@ -34,7 +34,8 @@ void do_quicksort(string input_filename, string output_filename, unsigned long o
 
 void do_merge_sort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
 {
-
+	ExternalMergeSort<long long> ext_sort(input_filename, output_filename, order, memory_limit);
+	ext_sort.sort();
 }
 
 int main(int argc, char **argv) {
@@ -56,8 +57,8 @@ int main(int argc, char **argv) {
 	cout << padded_string("Memory limit:") << memory_limit << endl;
 
 
-	do_quicksort(input_filename, output_filename, order, memory_limit);
-	//do_merge_sort(input_filename, output_filename, order, memory_limit);
+	//do_quicksort(input_filename, output_filename, order, memory_limit);
+	do_merge_sort(input_filename, output_filename, order, memory_limit);
 
 
 	int any_key;
