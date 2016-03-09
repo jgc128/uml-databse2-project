@@ -150,6 +150,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="quick_sort.cpp" />
     <ClCompile Include="random_number_generator.cpp" />
+    <ClCompile Include="record_io.cpp" />
     <ClCompile Include="time_measurer.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
@@ -157,6 +158,7 @@
     <ClInclude Include="ext_merge_sort.h" />
     <ClInclude Include="quick_sort.h" />
     <ClInclude Include="random_number_generator.h" />
+    <ClInclude Include="record_io.h" />
     <ClInclude Include="time_measurer.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
