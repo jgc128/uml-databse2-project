@@ -11,12 +11,12 @@ using namespace std;
 
 #define PAGE_SIZE (4 * 1024) // page size is 4K
 
-template<typename T>
+// T - the type of the records
+// RS - the size of the records in the file
+template<typename T, unsigned long RS> 
 class ExternalMergeSort{
 protected:
 
-	// Get records sizes etc
-	size_t record_size();
 	unsigned long records_in_page();
 	unsigned long pages_in_memory();
 
@@ -34,8 +34,7 @@ protected:
 
 	vector<T> read_records();
 	vector<T> read_records(unsigned long n);
-	vector<T> read_records(unsigned long n, streampos start_pos);
-	vector<T> read_records(unsigned long n, streamoff offset, ios_base::seekdir way);
+	vector<T> read_records(unsigned long n, unsigned long pos);
 
 	vector<size_t> generate_runs();
 
@@ -49,7 +48,7 @@ public:
 };
 
 
-template<typename T> ExternalMergeSort<T>::ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
+template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
 {
 	this->order = order;
 	this->memory_limit = memory_limit;
@@ -57,62 +56,63 @@ template<typename T> ExternalMergeSort<T>::ExternalMergeSort(string input_filena
 
 	input.open(input_filename);
 }
-template<typename T> ExternalMergeSort<T>::~ExternalMergeSort()
+template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::~ExternalMergeSort()
 {
 	input.close();
 	output.close();
 }
 
-
-template<typename T> size_t ExternalMergeSort<T>::record_size()
+template<typename T, unsigned long RS> unsigned long ExternalMergeSort<T, RS>::records_in_page()
 {
-	return sizeof(T);
+	return PAGE_SIZE / RS;
 }
-template<typename T> unsigned long ExternalMergeSort<T>::records_in_page()
-{
-	return PAGE_SIZE / record_size();
-}
-template<typename T> unsigned long ExternalMergeSort<T>::pages_in_memory()
+template<typename T, unsigned long RS> unsigned long ExternalMergeSort<T, RS>::pages_in_memory()
 {
 	return (memory_limit * 1024 * 1024) / PAGE_SIZE;
 }
 
 
-template<typename T> void ExternalMergeSort<T>::sort()
+template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::sort()
 {
 	auto runs_boundaries = generate_runs();
 }
 
-template<typename T> vector<size_t> ExternalMergeSort<T>::generate_runs()
+template<typename T, unsigned long RS> vector<size_t> ExternalMergeSort<T, RS>::generate_runs()
 {
 	auto nb_records_to_read = records_in_page() * pages_in_memory();
 	
 
-	auto records1 = read_records(3);
-	auto records2 = read_records(3);
+	auto records1 = read_records(4);
+	for (auto &r : records1)
+	{
+		cout << r << endl;
+	}
+	cout << endl;
+
 
 
 	return vector<size_t>(10);
 }
 
-template<typename T> vector<T> ExternalMergeSort<T>::read_records()
+template<typename T, unsigned long RS> vector<T> ExternalMergeSort<T, RS>::read_records()
 {
 	return read_records(0);
 }
 
-template<typename T> vector<T> ExternalMergeSort<T>::read_records(unsigned long n)
+template<typename T, unsigned long RS> vector<T> ExternalMergeSort<T, RS>::read_records(unsigned long n)
 {
 	vector<T> result;
 	if (n != 0)
 		result.resize(n);
 
-	string input_str;
+	char input_str[RS + 1]; // +1 for the \n
 	T input_val;
 
 	unsigned long cur_record = 0;
 	while (false == input.eof() && (cur_record < n || n == 0))
 	{
-		getline(input, input_str);
+		input.read(input_str, RS + 1);
+
 		stringstream convert(input_str);
 		convert >> input_val;
 
@@ -124,16 +124,19 @@ template<typename T> vector<T> ExternalMergeSort<T>::read_records(unsigned long 
 		cur_record++;
 	}
 
+	// shrink the vectos for the last records in the file
+	if (n != 0 && cur_record != n)
+	{
+		result.resize(cur_record);
+	}
+
 	return result;
 }
 
-template<typename T> vector<T> ExternalMergeSort<T>::read_records(unsigned long n, streampos start_pos)
+template<typename T, unsigned long RS> vector<T> ExternalMergeSort<T, RS>::read_records(unsigned long n, unsigned long pos)
 {
-	input.seekg(start_pos);
-	return read_records(n);
-}
-template<typename T> vector<T> ExternalMergeSort<T>::read_records(unsigned long n, streamoff offset, ios_base::seekdir way)
-{
-	input.seekg(offset, way);
+	auto real_pos = pos != 0 ? pos * (RS + 1) : 0; // +1 for the \n
+
+	input.seekg(real_pos);
 	return read_records(n);
 }

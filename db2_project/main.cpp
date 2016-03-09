@@ -10,6 +10,9 @@
 #include "random_number_generator.h"
 #include "ext_merge_sort.h"
 
+#define RECORD_TYPE long long
+#define RECORD_SIZE 16
+
 using namespace std;
 
 void do_quicksort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
@@ -34,7 +37,7 @@ void do_quicksort(string input_filename, string output_filename, unsigned long o
 
 void do_merge_sort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
 {
-	ExternalMergeSort<long long> ext_sort(input_filename, output_filename, order, memory_limit);
+	ExternalMergeSort<RECORD_TYPE, RECORD_SIZE> ext_sort(input_filename, output_filename, order, memory_limit);
 	ext_sort.sort();
 }
 
