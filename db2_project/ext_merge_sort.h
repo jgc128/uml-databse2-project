@@ -124,7 +124,7 @@ template<typename T, unsigned long RS> vector<T> ExternalMergeSort<T, RS>::read_
 		cur_record++;
 	}
 
-	// shrink the vectos for the last records in the file
+	// shrink the vector for the last records in the file
 	if (n != 0 && cur_record != n)
 	{
 		result.resize(cur_record);
@@ -135,8 +135,8 @@ template<typename T, unsigned long RS> vector<T> ExternalMergeSort<T, RS>::read_
 
 template<typename T, unsigned long RS> vector<T> ExternalMergeSort<T, RS>::read_records(unsigned long n, unsigned long pos)
 {
-	auto real_pos = pos != 0 ? pos * (RS + 1) : 0; // +1 for the \n
-
+	auto real_pos = pos * (RS + 1); // +1 for the \n
 	input.seekg(real_pos);
+
 	return read_records(n);
 }
