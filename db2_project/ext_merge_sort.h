@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 
+#include "utils.h"
 #include "quick_sort.h"
 #include "record_io.h"
 
@@ -30,7 +31,11 @@ protected:
 	unsigned long records_in_page();
 	unsigned long pages_in_memory();
 
+	void print_runs(const vector<Run> & runs);
+
 	vector<Run> create_runs();
+
+
 
 public:
 	ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit);
@@ -46,15 +51,10 @@ template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::ExternalMergeSo
 {
 	this->order = order;
 	this->memory_limit = memory_limit;
-
-
-	//input = new RecordIO<T, RS>(input_filename, ios::in);
-	//output = new RecordIO<T, RS>(input_filename, ios::in | ios::out | ios::trunc);
 }
 template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::~ExternalMergeSort()
 {
-	//delete input;
-	//delete output;
+
 }
 
 template<typename T, unsigned long RS> unsigned long ExternalMergeSort<T, RS>::records_in_page()
@@ -66,10 +66,29 @@ template<typename T, unsigned long RS> unsigned long ExternalMergeSort<T, RS>::p
 	return (memory_limit * 1024 * 1024) / PAGE_SIZE;
 }
 
+template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::print_runs(const vector<Run> & runs)
+{
+	cout << padded_string("Runs:") << runs.size() << endl;
+	for (auto &r : runs)
+	{
+		cout << padded_string("run:") << r.pos << ":" << r.records << endl;
+	}
+}
+
 
 template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::sort()
 {
 	auto runs = create_runs();
+	print_runs(runs);
+
+
+
+
+
+
+
+
+	int i = 0;
 }
 
 template<typename T, unsigned long RS> vector<Run> ExternalMergeSort<T, RS>::create_runs()
@@ -90,10 +109,7 @@ template<typename T, unsigned long RS> vector<Run> ExternalMergeSort<T, RS>::cre
 			quick_sort.sort(records);
 			output.write_records(records);
 
-			Run r = {
-				cur_pos,
-				cur_records
-			};
+			Run r = { cur_pos, cur_records };
 			runs.push_back(r);
 		}
 
