@@ -18,7 +18,8 @@ using namespace std;
 void do_quicksort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
 {
 	// load file to perform quicksort
-	auto numbers = load_file(input_filename);
+	RecordIO<RECORD_TYPE, RECORD_SIZE> input(input_filename);
+	auto numbers = input.read_records();
 
 	cout << padded_string("Numbers:") << numbers.size() << endl;
 
