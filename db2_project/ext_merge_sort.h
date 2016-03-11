@@ -5,6 +5,7 @@
 #include <vector>
 #include <queue>
 #include <functional>
+#include <numeric>
 
 #include "utils.h"
 #include "quick_sort.h"
@@ -18,6 +19,19 @@ struct Run {
 	unsigned long pos;
 	size_t records;
 };
+inline bool operator < (const Run & left, const Run & right)
+{
+	return left.pos < right.pos;
+}
+inline bool operator > (const Run & left, const Run & right)
+{
+	return operator < (right, left);
+}
+inline bool operator == (const Run & left, const Run & right)
+{
+	return left.pos == right.pos;
+}
+
 
 template<typename T> struct RecordRunInfo {
 	T value;
@@ -49,11 +63,11 @@ protected:
 	unsigned long order;
 	unsigned long memory_limit;
 
-	unsigned long records_in_page();
-	unsigned long pages_in_memory();
+	size_t records_in_page();
+	size_t pages_in_memory();
 
 	queue<Run> create_runs();
-	void merge(queue<Run> & runs, unsigned long n);
+	void merge(queue<Run> & runs, size_t n);
 
 public:
 	ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit);
@@ -77,13 +91,13 @@ template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::~ExternalMergeS
 
 }
 
-template<typename T, unsigned long RS> unsigned long ExternalMergeSort<T, RS>::records_in_page()
+template<typename T, unsigned long RS> size_t ExternalMergeSort<T, RS>::records_in_page()
 {
-	return 3; //PAGE_SIZE / RS;
+	return PAGE_SIZE / RS; // 1; //
 }
-template<typename T, unsigned long RS> unsigned long ExternalMergeSort<T, RS>::pages_in_memory()
+template<typename T, unsigned long RS> size_t ExternalMergeSort<T, RS>::pages_in_memory()
 {
-	return 1; //(memory_limit * 1024 * 1024) / PAGE_SIZE;
+	return (memory_limit * 1024 * 1024) / PAGE_SIZE; // 3; //
 }
 
 
@@ -92,21 +106,62 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::sort()
 	auto runs = create_runs();
 	cout << padded_string("Runs:") << runs.size() << endl;
 
-	merge(runs, 10);
+	cout << endl;
 
+	auto nb_runs_to_merge = pages_in_memory() - 1;
+	auto i = 0;
+	while (runs.size() > 0) 
+	{
+		cout << padded_string("Merge:") << i << endl;
+		merge(runs, nb_runs_to_merge);
+		cout << endl;
 
-	int i = 0;
+		i++;
+	}
 }
 
-template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queue<Run> & runs, unsigned long n)
+template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queue<Run> & runs, size_t n)
 {
+	QuickSort<Run> quick_sort;
+
+	n = min(n, runs.size());
+
 	vector<Run> runs_to_merge(n);
-	for (unsigned i = 0;i < n; i++)
+	for (unsigned i = 0; i < n; i++)
 	{
 		auto r = runs.front();
 		runs_to_merge[i] = r;
 		runs.pop();
 	}
+
+	// check compatibility for runs
+	if (
+		runs.size() != 0 
+		&& runs_to_merge.size() > 1
+		&& (runs_to_merge[0].pos + runs_to_merge[0].records != runs_to_merge[1].pos)
+	)
+	{
+		auto r = runs.front();
+		runs.pop();
+		runs.push(runs_to_merge[0]);
+
+		for (unsigned i = 1; i < n; i++)
+		{
+			runs_to_merge[i - 1] = runs_to_merge[i];
+		}
+
+		runs_to_merge[n-1] = r;
+	}
+
+	// sort runs
+	quick_sort.sort(runs_to_merge);
+
+	cout << padded_string("Runs:");
+	for (const auto & r : runs_to_merge)
+	{
+		cout << r.pos << ":" << r.records << " ";
+	}
+	cout << endl;
 
 	priority_queue<RecordRunInfo<T>, vector<RecordRunInfo<T>>, greater<RecordRunInfo<T>>> records;
 	
@@ -127,6 +182,8 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 		runs_postions[i] += 1;
 	}
 
+	// merge runs
+	tmp_file.set_write_postion(0);
 	while(records.size() != 0)
 	{
 		auto smallest_rec = records.top();
@@ -142,6 +199,36 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 
 			runs_postions[smallest_rec.run] += 1;
 		}
+	}
+
+	// create a run for the sorted records
+	auto new_run_pos = runs_to_merge[0].pos;
+	auto new_run_records = runs_to_merge[runs_to_merge.size() - 1].pos + runs_to_merge[runs_to_merge.size() - 1].records - runs_to_merge[0].pos;
+	if (runs.size() != 0)
+	{
+		Run r = { new_run_pos, new_run_records };
+		runs.push(r);
+	}
+
+	// write the content of the tmp file to the output file
+
+	output.set_write_postion(new_run_pos);
+	tmp_file.set_read_postion(0);
+	unsigned long records_to_read = records_in_page() * pages_in_memory();
+	unsigned long cur_records = 0;
+	unsigned long cur_pos = 0;
+	while(cur_pos < new_run_records)
+	{
+		// for the last batch we do not want to read more than the run actually contains
+		auto records = tmp_file.read_records(min(new_run_records - cur_pos, records_to_read));
+
+		cur_records = records.size();
+
+		if (cur_records != 0) {
+			output.write_records(records);
+		}
+
+		cur_pos += cur_records;
 	}
 
 }
