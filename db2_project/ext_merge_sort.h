@@ -69,6 +69,8 @@ protected:
 	queue<Run> create_runs();
 	void merge(queue<Run> & runs, size_t n);
 
+	size_t previous_run_size = 0;
+
 public:
 	ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit);
 	~ExternalMergeSort();
@@ -93,11 +95,11 @@ template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::~ExternalMergeS
 
 template<typename T, unsigned long RS> size_t ExternalMergeSort<T, RS>::records_in_page()
 {
-	return PAGE_SIZE / RS; // 1; //
+	return 512; //PAGE_SIZE / RS; // 1; //
 }
 template<typename T, unsigned long RS> size_t ExternalMergeSort<T, RS>::pages_in_memory()
 {
-	return (memory_limit * 1024 * 1024) / PAGE_SIZE; // 3; //
+	return 3; //(memory_limit * 1024 * 1024) / PAGE_SIZE; // 3; //
 }
 
 
@@ -130,31 +132,23 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 	for (unsigned i = 0; i < n; i++)
 	{
 		auto r = runs.front();
+
+		if (i > 0 && runs_to_merge[0].records < r.records) // the previous run was the last run of the size that we are merging this time
+		{
+			runs_to_merge.resize(i);
+			n = i;
+			break;
+		}
+
 		runs_to_merge[i] = r;
 		runs.pop();
 	}
 
-	// check compatibility for runs
-	if (
-		runs.size() != 0 
-		&& runs_to_merge.size() > 1
-		&& (runs_to_merge[0].pos + runs_to_merge[0].records != runs_to_merge[1].pos)
-	)
+	if (runs_to_merge[0].records > previous_run_size)
 	{
-		auto r = runs.front();
-		runs.pop();
-		runs.push(runs_to_merge[0]);
-
-		for (unsigned i = 1; i < n; i++)
-		{
-			runs_to_merge[i - 1] = runs_to_merge[i];
-		}
-
-		runs_to_merge[n-1] = r;
+		cout << "CHANGE RUN SIZE: " << previous_run_size << " -> " << runs_to_merge[0].records << endl;
 	}
 
-	// sort runs
-	quick_sort.sort(runs_to_merge);
 
 	cout << padded_string("Runs:");
 	for (const auto & r : runs_to_merge)
@@ -231,6 +225,8 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 		cur_pos += cur_records;
 	}
 
+	if(runs_to_merge[0].records > previous_run_size)
+		previous_run_size = runs_to_merge[0].records;
 }
 
 template<typename T, unsigned long RS> queue<Run> ExternalMergeSort<T, RS>::create_runs()
