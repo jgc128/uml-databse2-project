@@ -14,6 +14,7 @@ class RecordIO {
 protected:
 	const char fill_char;
 
+	string filename;
 	fstream file;
 public:
 	RecordIO(string filename);
@@ -36,6 +37,9 @@ public:
 	void set_write_postion(unsigned long pos);
 
 	void flush();
+	void close();
+
+	string get_filename();
 };
 
 
@@ -47,11 +51,12 @@ template<typename T, unsigned long RS> RecordIO<T, RS>::RecordIO(string filename
 template<typename T, unsigned long RS> RecordIO<T, RS>::RecordIO(string filename, ios_base::openmode mode)
 	: fill_char('0')
 {
-	file.open(filename, mode | ios::binary);
+	this->filename = filename;
+	file.open(this->filename, mode | ios::binary);
 }
 template<typename T, unsigned long RS> RecordIO<T, RS>::~RecordIO()
 {
-	file.close();
+	close();
 }
 
 template<typename T, unsigned long RS> inline unsigned long RecordIO<T, RS>::get_file_position(unsigned long pos)
@@ -72,6 +77,16 @@ template<typename T, unsigned long RS> void RecordIO<T, RS>::set_write_postion(u
 template<typename T, unsigned long RS> void RecordIO<T, RS>::flush()
 {
 	file.flush();
+}
+
+template<typename T, unsigned long RS> string RecordIO<T, RS>::get_filename()
+{
+	return filename;
+}
+
+template<typename T, unsigned long RS> void RecordIO<T, RS>::close()
+{
+	file.close();
 }
 
 template<typename T, unsigned long RS> vector<T> RecordIO<T, RS>::read_records()

@@ -6,6 +6,7 @@
 #include <queue>
 #include <functional>
 #include <numeric>
+#include <cstdio>
 
 #include "utils.h"
 #include "quick_sort.h"
@@ -60,6 +61,9 @@ protected:
 	RecordIO<T, RS> output;
 	RecordIO<T, RS> tmp_file;
 
+	RecordIO<T, RS> * current_output;
+	RecordIO<T, RS> * current_tmp;
+
 	unsigned long order;
 	unsigned long memory_limit;
 
@@ -95,11 +99,11 @@ template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::~ExternalMergeS
 
 template<typename T, unsigned long RS> size_t ExternalMergeSort<T, RS>::records_in_page()
 {
-	return 512; //PAGE_SIZE / RS; // 1; //
+	return PAGE_SIZE / RS;
 }
 template<typename T, unsigned long RS> size_t ExternalMergeSort<T, RS>::pages_in_memory()
 {
-	return 3; //(memory_limit * 1024 * 1024) / PAGE_SIZE; // 3; //
+	return (memory_limit * 1024 * 1024) / PAGE_SIZE;
 }
 
 
@@ -107,8 +111,10 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::sort()
 {
 	auto runs = create_runs();
 	cout << padded_string("Runs:") << runs.size() << endl;
-
 	cout << endl;
+
+	current_output = &output;
+	current_tmp = &tmp_file;
 
 	auto nb_runs_to_merge = pages_in_memory() - 1;
 	auto i = 0;
@@ -120,12 +126,28 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::sort()
 
 		i++;
 	}
+
+	output.close();
+	tmp_file.close();
+	input.close();
+
+	// rename the output file and remove tmp file
+	if (current_output != &tmp_file)
+	{
+		cout << "Need to exchange the tmp file and the output file" << endl;
+		cout << endl;
+
+		remove(output.get_filename().c_str());
+		rename(tmp_file.get_filename().c_str(), output.get_filename().c_str());
+	}
+	else 
+	{
+		remove(tmp_file.get_filename().c_str());
+	}
 }
 
 template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queue<Run> & runs, size_t n)
 {
-	QuickSort<Run> quick_sort;
-
 	n = min(n, runs.size());
 
 	vector<Run> runs_to_merge(n);
@@ -146,7 +168,13 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 
 	if (runs_to_merge[0].records > previous_run_size)
 	{
-		cout << "CHANGE RUN SIZE: " << previous_run_size << " -> " << runs_to_merge[0].records << endl;
+		cout << "Change run size: " << previous_run_size << " -> " << runs_to_merge[0].records << endl;
+
+		if(previous_run_size != 0)
+			swap(current_output, current_tmp);
+
+		current_tmp->set_write_postion(0);
+		current_output->set_read_postion(0);
 	}
 
 
@@ -169,7 +197,7 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 	// fill the priority queue initially
 	for (unsigned i = 0; i < n; i++)
 	{
-		auto rec = output.read_records(1, runs_postions[i]);
+		auto rec = current_output->read_records(1, runs_postions[i]);
 		RecordRunInfo<T> rec_run_info = { rec[0], i };
 		records.push(rec_run_info);
 
@@ -177,17 +205,16 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 	}
 
 	// merge runs
-	tmp_file.set_write_postion(0);
 	while(records.size() != 0)
 	{
 		auto smallest_rec = records.top();
 		records.pop();
 
-		tmp_file.write_record(smallest_rec.value);
+		current_tmp->write_record(smallest_rec.value);
 
 		if (runs_postions[smallest_rec.run] < runs_to_merge[smallest_rec.run].pos + runs_to_merge[smallest_rec.run].records)
 		{
-			auto rec = output.read_records(1, runs_postions[smallest_rec.run]);
+			auto rec = current_output->read_records(1, runs_postions[smallest_rec.run]);
 			RecordRunInfo<T> rec_run_info = { rec[0], smallest_rec.run };
 			records.push(rec_run_info);
 
@@ -202,27 +229,6 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 	{
 		Run r = { new_run_pos, new_run_records };
 		runs.push(r);
-	}
-
-	// write the content of the tmp file to the output file
-
-	output.set_write_postion(new_run_pos);
-	tmp_file.set_read_postion(0);
-	unsigned long records_to_read = records_in_page() * pages_in_memory();
-	unsigned long cur_records = 0;
-	unsigned long cur_pos = 0;
-	while(cur_pos < new_run_records)
-	{
-		// for the last batch we do not want to read more than the run actually contains
-		auto records = tmp_file.read_records(min(new_run_records - cur_pos, records_to_read));
-
-		cur_records = records.size();
-
-		if (cur_records != 0) {
-			output.write_records(records);
-		}
-
-		cur_pos += cur_records;
 	}
 
 	if(runs_to_merge[0].records > previous_run_size)
