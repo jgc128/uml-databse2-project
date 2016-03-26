@@ -74,7 +74,6 @@ protected:
 	void merge(queue<Run> & runs, size_t n);
 
 	size_t previous_run_size = 0;
-
 public:
 	ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit);
 	~ExternalMergeSort();
@@ -185,7 +184,13 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 	}
 	cout << endl;
 
-	priority_queue<RecordRunInfo<T>, vector<RecordRunInfo<T>>, greater<RecordRunInfo<T>>> records;
+	function<bool(const RecordRunInfo<T> & a, const RecordRunInfo<T> & b)> comp;
+	if (order == 0)
+		comp = [](const RecordRunInfo<T> & a, const RecordRunInfo<T> & b) -> bool { return a > b; };
+	else
+		comp = [](const RecordRunInfo<T> & a, const RecordRunInfo<T> & b) -> bool { return a < b; };
+		
+	priority_queue<RecordRunInfo<T>, vector<RecordRunInfo<T>>, function<bool(const RecordRunInfo<T> & a, const RecordRunInfo<T> & b)>> records(comp);
 	
 	// set the initial positions of the runs
 	vector<unsigned long> runs_postions(n);
@@ -250,7 +255,7 @@ template<typename T, unsigned long RS> queue<Run> ExternalMergeSort<T, RS>::crea
 		cur_records = records.size();
 
 		if (cur_records != 0) {
-			quick_sort.sort(records);
+			quick_sort.sort(records, order);
 			output.write_records(records);
 
 			Run r = { cur_pos, cur_records };

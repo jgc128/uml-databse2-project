@@ -71,8 +71,8 @@ int main(int argc, char **argv) {
 	cout << padded_string("Memory limit:") << memory_limit << endl;
 	cout << endl;
 
-	do_quicksort(input_filename, output_filename, order, memory_limit);
-	//do_merge_sort(input_filename, output_filename, order, memory_limit);
+	//do_quicksort(input_filename, output_filename, order, memory_limit);
+	do_merge_sort(input_filename, output_filename, order, memory_limit);
 
 	cout << "All done!" << endl;
 
