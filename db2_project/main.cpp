@@ -27,7 +27,7 @@ void do_quicksort(string input_filename, string output_filename, unsigned long o
 	time_measurer.start();
 
 	QuickSort<RECORD_TYPE> sorting;
-	sorting.sort(numbers);
+	sorting.sort(numbers, order);
 
 	// write results
 	RecordIO<RECORD_TYPE, RECORD_SIZE> output(output_filename, ios::out | ios::trunc);
