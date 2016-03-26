@@ -7,3 +7,8 @@
 
 using namespace std;
 
+ostream & operator << (ostream & os, const SortOrder & order)
+{
+	os << (order == SortOrder::Ascending ? "Ascending" : "Descending");
+	return os;
+}

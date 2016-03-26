@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "random_number_generator.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -13,19 +14,19 @@ protected:
 	unsigned long long partition_calls;
 	unsigned long long quicksort_calls;
 
-	size_t partition(vector<T> &data, size_t low, size_t high, unsigned long order);
-	void quicksort(vector<T> &data, size_t low, size_t high, unsigned long order);
+	size_t partition(vector<T> &data, size_t low, size_t high, SortOrder order);
+	void quicksort(vector<T> &data, size_t low, size_t high, SortOrder order);
 public:
 	void sort(vector<T> &data);
-	void sort(vector<T> &data, unsigned long order);
+	void sort(vector<T> &data, SortOrder order);
 	void sort(vector<T> &data, size_t low, size_t high);
-	void sort(vector<T> &data, size_t low, size_t high, unsigned long order);
+	void sort(vector<T> &data, size_t low, size_t high, SortOrder order);
 
 	unsigned long long number_passes();
 };
 
 
-template<typename T> size_t QuickSort<T>::partition(vector<T> &data, size_t low, size_t high, unsigned long order)
+template<typename T> size_t QuickSort<T>::partition(vector<T> &data, size_t low, size_t high, SortOrder order)
 {
 	partition_calls++;
 
@@ -40,7 +41,7 @@ template<typename T> size_t QuickSort<T>::partition(vector<T> &data, size_t low,
 
 	function<bool(const T & a, const T & b)> comp_l = [](const T & a, const T & b) -> bool { return a < b; };
 	function<bool(const T & a, const T & b)> comp_r = [](const T & a, const T & b) -> bool { return a > b; };
-	if (order != 0)
+	if (order != SortOrder::Ascending)
 		swap(comp_l, comp_r);
 
 	while (true)
@@ -60,7 +61,7 @@ template<typename T> size_t QuickSort<T>::partition(vector<T> &data, size_t low,
 	}
 }
 
-template<typename T> void QuickSort<T>::quicksort(vector<T> &data, size_t low, size_t high, unsigned long order)
+template<typename T> void QuickSort<T>::quicksort(vector<T> &data, size_t low, size_t high, SortOrder order)
 {
 	quicksort_calls++;
 
@@ -74,17 +75,17 @@ template<typename T> void QuickSort<T>::quicksort(vector<T> &data, size_t low, s
 
 template<typename T> void QuickSort<T>::sort(vector<T> &data)
 {
-	sort(data, 0);
+	sort(data, SortOrder::Ascending);
 }
-template<typename T> void QuickSort<T>::sort(vector<T> &data, unsigned long order)
+template<typename T> void QuickSort<T>::sort(vector<T> &data, SortOrder order)
 {
 	sort(data, 0, data.size() - 1, order);
 }
 template<typename T> void QuickSort<T>::sort(vector<T> &data, size_t low, size_t high)
 {
-	sort(data, low, high, order);
+	sort(data, low, high, SortOrder::Ascending);
 }
-template<typename T> void QuickSort<T>::sort(vector<T> &data, size_t low, size_t high, unsigned long order)
+template<typename T> void QuickSort<T>::sort(vector<T> &data, size_t low, size_t high, SortOrder order)
 {
 	partition_calls = 0;
 	quicksort_calls = 0;

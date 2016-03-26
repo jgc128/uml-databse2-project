@@ -22,3 +22,15 @@ template<typename T> string padded_string(T data, const unsigned int width, cons
 	return s.str();
 }
 
+
+/* =======================================
+=== Misc =================================
+========================================*/
+
+enum class SortOrder 
+{ 
+	Ascending,
+	Descending
+};
+
+ostream & operator << (ostream & os, const SortOrder & order);

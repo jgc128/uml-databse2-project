@@ -64,7 +64,7 @@ protected:
 	RecordIO<T, RS> * current_output;
 	RecordIO<T, RS> * current_tmp;
 
-	unsigned long order;
+	SortOrder order;
 	unsigned long memory_limit;
 
 	size_t records_in_page();
@@ -75,7 +75,7 @@ protected:
 
 	size_t previous_run_size = 0;
 public:
-	ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit);
+	ExternalMergeSort(string input_filename, string output_filename, SortOrder order, unsigned long memory_limit);
 	~ExternalMergeSort();
 
 	void sort();
@@ -83,7 +83,7 @@ public:
 };
 
 
-template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::ExternalMergeSort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
+template<typename T, unsigned long RS> ExternalMergeSort<T, RS>::ExternalMergeSort(string input_filename, string output_filename, SortOrder order, unsigned long memory_limit)
 	: input(input_filename, ios::in)
 	, output(output_filename, ios::in | ios::out | ios::trunc)
 	, tmp_file(output_filename + "_tmp", ios::in | ios::out | ios::trunc)
@@ -185,7 +185,7 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 	cout << endl;
 
 	function<bool(const RecordRunInfo<T> & a, const RecordRunInfo<T> & b)> comp;
-	if (order == 0)
+	if (order == SortOrder::Ascending)
 		comp = [](const RecordRunInfo<T> & a, const RecordRunInfo<T> & b) -> bool { return a > b; };
 	else
 		comp = [](const RecordRunInfo<T> & a, const RecordRunInfo<T> & b) -> bool { return a < b; };

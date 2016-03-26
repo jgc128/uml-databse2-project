@@ -15,7 +15,7 @@
 
 using namespace std;
 
-void do_quicksort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
+void do_quicksort(string input_filename, string output_filename, SortOrder order, unsigned long memory_limit)
 {
 	// load file to perform quicksort
 	RecordIO<RECORD_TYPE, RECORD_SIZE> input(input_filename);
@@ -39,7 +39,7 @@ void do_quicksort(string input_filename, string output_filename, unsigned long o
 	cout << padded_string("Sorted:") << num_passes << "ps, " << time_taken << "ms" << endl;
 }
 
-void do_merge_sort(string input_filename, string output_filename, unsigned long order, unsigned long memory_limit)
+void do_merge_sort(string input_filename, string output_filename, SortOrder order, unsigned long memory_limit)
 {
 	TimeMeasurer time_measurer;
 	time_measurer.start();
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
 	auto input_filename = argv[1];
 	auto output_filename = argv[2];
-	auto order = strtoul(argv[3], NULL, 0);
+	auto order = strtoul(argv[3], NULL, 0) == 0 ? SortOrder::Ascending : SortOrder::Descending;
 	auto memory_limit = strtoul(argv[4], NULL, 0);
 
 	cout << padded_string("Input:") << input_filename << endl;
