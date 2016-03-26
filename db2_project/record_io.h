@@ -105,6 +105,8 @@ template<typename T, unsigned long RS> vector<T> RecordIO<T, RS>::read_records(u
 	while (false == file.eof() && (cur_record < n || n == 0))
 	{
 		file.read(input_str, RS + 1);
+		if (file.gcount() == 0)
+			continue;
 
 		stringstream convert(input_str);
 		convert >> input_val;
