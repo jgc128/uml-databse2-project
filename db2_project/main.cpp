@@ -29,6 +29,10 @@ void do_quicksort(string input_filename, string output_filename, unsigned long o
 	QuickSort<RECORD_TYPE> sorting;
 	sorting.sort(numbers);
 
+	// write results
+	RecordIO<RECORD_TYPE, RECORD_SIZE> output(output_filename, ios::out | ios::trunc);
+	output.write_records(numbers);
+
 	auto time_taken = time_measurer.end();
 	auto num_passes = sorting.number_passes();
 
@@ -67,13 +71,10 @@ int main(int argc, char **argv) {
 	cout << padded_string("Memory limit:") << memory_limit << endl;
 	cout << endl;
 
-	//do_quicksort(input_filename, output_filename, order, memory_limit);
-	do_merge_sort(input_filename, output_filename, order, memory_limit);
+	do_quicksort(input_filename, output_filename, order, memory_limit);
+	//do_merge_sort(input_filename, output_filename, order, memory_limit);
 
 	cout << "All done!" << endl;
-
-	int any_key;
-	cin >> any_key;
 
 	return 0;
 }

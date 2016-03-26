@@ -24,13 +24,11 @@ public:
 	vector<T> read_records();
 	vector<T> read_records(unsigned long n);
 	vector<T> read_records(unsigned long n, unsigned long pos);
-	//T read_record();
-	//T read_record(unsigned long pos);
 
-	void write_records(vector<T> records);
-	void write_records(vector<T> records, unsigned long pos);
-	void write_record(T record);
-	void write_record(T record, unsigned long pos);
+	void write_records(const vector<T> & records);
+	void write_records(const vector<T> & records, unsigned long pos);
+	void write_record(const T & record);
+	void write_record(const T & record, unsigned long pos);
 
 	inline unsigned long get_file_position(unsigned long pos);
 	void set_read_postion(unsigned long pos);
@@ -134,18 +132,7 @@ template<typename T, unsigned long RS> vector<T> RecordIO<T, RS>::read_records(u
 	return read_records(n);
 }
 
-//template<typename T, unsigned long RS> T RecordIO<T, RS>::read_record()
-//{
-//
-//}
-//template<typename T, unsigned long RS> T RecordIO<T, RS>::read_record(unsigned long pos)
-//{
-//	set_read_postion(pos);
-//	return read_record();
-//}
-
-
-template<typename T, unsigned long RS> void RecordIO<T, RS>::write_records(vector<T> records)
+template<typename T, unsigned long RS> void RecordIO<T, RS>::write_records(const vector<T> & records)
 {
 	for (auto const &r : records)
 	{
@@ -153,17 +140,17 @@ template<typename T, unsigned long RS> void RecordIO<T, RS>::write_records(vecto
 	}
 }
 
-template<typename T, unsigned long RS> void RecordIO<T, RS>::write_records(vector<T> records, unsigned long pos)
+template<typename T, unsigned long RS> void RecordIO<T, RS>::write_records(const vector<T> & records, unsigned long pos)
 {
 	set_write_postion(pos);
 	write_records(records);
 }
 
-template<typename T, unsigned long RS> void RecordIO<T, RS>::write_record(T record)
+template<typename T, unsigned long RS> void RecordIO<T, RS>::write_record(const T & record)
 {
 	file << right << setfill(fill_char) << setw(RS) << record << endl;
 }
-template<typename T, unsigned long RS> void RecordIO<T, RS>::write_record(T record, unsigned long pos)
+template<typename T, unsigned long RS> void RecordIO<T, RS>::write_record(const T & record, unsigned long pos)
 {
 	set_write_postion(pos);
 	write_record(record);
