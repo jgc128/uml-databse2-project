@@ -13,6 +13,8 @@
 #define RECORD_TYPE long long
 #define RECORD_SIZE 16
 
+#define MAX_MEM 4096
+
 using namespace std;
 
 void do_quicksort(string input_filename, string output_filename, SortOrder order, unsigned long memory_limit)
@@ -64,6 +66,17 @@ int main(int argc, char **argv) {
 	auto output_filename = argv[2];
 	auto order = strtoul(argv[3], NULL, 0) == 0 ? SortOrder::Ascending : SortOrder::Descending;
 	auto memory_limit = strtoul(argv[4], NULL, 0);
+
+	if(memory_limit == 0 || memory_limit > MAX_MEM)
+	{
+		cerr << "Invalid memory limit" << endl;
+		return 1;
+	}
+	if(!is_file_exist(input_filename))
+	{
+		cerr << "Invalid input file" << endl;
+		return 1;
+	}
 
 	cout << padded_string("Input:") << input_filename << endl;
 	cout << padded_string("Output:") << output_filename << endl;

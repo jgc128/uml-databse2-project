@@ -34,3 +34,6 @@ enum class SortOrder
 };
 
 ostream & operator << (ostream & os, const SortOrder & order);
+
+
+bool is_file_exist(const char *filename);
