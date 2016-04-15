@@ -133,8 +133,8 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::sort()
 	// rename the output file and remove tmp file
 	if (current_output != &tmp_file)
 	{
-		cout << "Need to exchange the tmp file and the output file" << endl;
-		cout << endl;
+		//cout << "Need to exchange the tmp file and the output file" << endl;
+		//cout << endl;
 
 		remove(output.get_filename().c_str());
 		rename(tmp_file.get_filename().c_str(), output.get_filename().c_str());
@@ -167,7 +167,7 @@ template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::merge(queu
 
 	if (runs_to_merge[0].records > previous_run_size)
 	{
-		cout << "Change run size: " << previous_run_size << " -> " << runs_to_merge[0].records << endl;
+		//cout << "Change run size: " << previous_run_size << " -> " << runs_to_merge[0].records << endl;
 
 		if(previous_run_size != 0)
 			swap(current_output, current_tmp);

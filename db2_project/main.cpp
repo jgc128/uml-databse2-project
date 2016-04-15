@@ -87,7 +87,5 @@ int main(int argc, char **argv) {
 	//do_quicksort(input_filename, output_filename, order, memory_limit);
 	do_merge_sort(input_filename, output_filename, order, memory_limit);
 
-	cout << "All done!" << endl;
-
 	return 0;
 }
