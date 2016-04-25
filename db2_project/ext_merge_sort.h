@@ -108,6 +108,10 @@ template<typename T, unsigned long RS> size_t ExternalMergeSort<T, RS>::pages_in
 
 template<typename T, unsigned long RS> void ExternalMergeSort<T, RS>::sort()
 {
+	cout << padded_string("Records in page:") << records_in_page() << endl;
+	cout << padded_string("Pages in memory:") << pages_in_memory() << endl;
+	cout << endl;
+
 	auto runs = create_runs();
 	cout << padded_string("Runs:") << runs.size() << endl;
 	cout << endl;

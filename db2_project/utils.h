@@ -13,7 +13,7 @@ using namespace std;
 === Printing Utilities ===================
 ========================================*/
 
-template<typename T> string padded_string(T data, const unsigned int width = 15, const char separator = ' ');
+template<typename T> string padded_string(T data, const unsigned int width = 20, const char separator = ' ');
 
 template<typename T> string padded_string(T data, const unsigned int width, const char separator)
 {
