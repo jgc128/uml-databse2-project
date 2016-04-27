@@ -16,6 +16,11 @@ protected:
 
 	string filename;
 	fstream file;
+
+	void convert_record(char * input_str, int & result);
+	void convert_record(char * input_str, long & result);
+	void convert_record(char * input_str, long long & result);
+
 public:
 	RecordIO(string filename);
 	RecordIO(string filename, ios_base::openmode mode);
@@ -56,6 +61,20 @@ template<typename T, unsigned long RS> RecordIO<T, RS>::~RecordIO()
 {
 	close();
 }
+
+template<typename T, unsigned long RS> void RecordIO<T, RS>::convert_record(char * input_str, int & result)
+{
+	result = atoi(input_str);
+}
+template<typename T, unsigned long RS> void RecordIO<T, RS>::convert_record(char * input_str, long & result)
+{
+	result = atol(input_str);
+}
+template<typename T, unsigned long RS> void RecordIO<T, RS>::convert_record(char * input_str, long long & result)
+{
+	result = atoll(input_str);
+}
+
 
 template<typename T, unsigned long RS> inline unsigned long RecordIO<T, RS>::get_file_position(unsigned long pos)
 {
@@ -108,8 +127,7 @@ template<typename T, unsigned long RS> vector<T> RecordIO<T, RS>::read_records(u
 		if (file.gcount() == 0)
 			continue;
 
-		stringstream convert(input_str);
-		convert >> input_val;
+		convert_record(input_str, input_val);
 
 		if (n == 0)
 			result.push_back(input_val);
