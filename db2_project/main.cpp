@@ -19,14 +19,15 @@ using namespace std;
 
 void do_quicksort(string input_filename, string output_filename, SortOrder order, unsigned long memory_limit)
 {
-	// load file to perform quicksort
+	TimeMeasurer time_measurer;
+	time_measurer.start();
+
+	// load the whole file to perform quicksort
 	RecordIO<RECORD_TYPE, RECORD_SIZE> input(input_filename);
 	auto numbers = input.read_records();
 
 	cout << padded_string("Numbers:") << numbers.size() << endl;
 
-	TimeMeasurer time_measurer;
-	time_measurer.start();
 
 	QuickSort<RECORD_TYPE> sorting;
 	sorting.sort(numbers, order);
